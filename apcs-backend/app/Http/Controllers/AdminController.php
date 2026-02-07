@@ -35,7 +35,7 @@ class AdminController extends Controller
             $bookedAmount = 0;
 
             $schedule = $daySlots->map(function ($slot) use (&$bookedAmount) {
-                $bookedCapacity = Booking::where('timeslot_id', $slot->timeslot_id)
+                $bookedCapacity = Booking::where('timeslot_id', $slot->id)
                     ->whereIn('status', ['pending', 'in'])
                     ->count();
 

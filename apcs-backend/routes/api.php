@@ -46,24 +46,33 @@ Route::middleware('auth:sanctum')->prefix('gate')->group(function () {
     Route::post('/complete', [GateController::class, 'completeShipment']); // Operator only
 });
 
-// Admin API Routes
-Route::middleware('auth:sanctum')->prefix('admin')->group(function () {
-    // Schedule routes
-    Route::get('/schedule', [AdminController::class, 'getSchedule']); // Today
-    Route::get('/schedule/{date}', [AdminController::class, 'getScheduleByDate']); // Specific date
-    Route::get('/schedule/{startDate}/{endDate}', [AdminController::class, 'getSchedule']); // Date range
+// Schedule routes
+Route::get('/schedule/{startDate}/{endDate}', [AdminController::class, 'getSchedule']); // Today
+Route::get('/schedule/{date}', [AdminController::class, 'getScheduleByDate']); // Specific date
+Route::get('/schedule/{startDate}/{endDate}', [AdminController::class, 'getSchedule']); // Date range
 
-    // Data routes
-    Route::get('/data/logs/{startDate}/{endDate}', [AdminController::class, 'getLogs']);
-    Route::get('/data/schedule/{date}', [AdminController::class, 'getScheduleByDate']);
+// Data routes
+Route::get('/data/logs/{startDate}/{endDate}', [AdminController::class, 'getLogs']);
+Route::get('/data/schedule/{date}', [AdminController::class, 'getScheduleByDate']);
 
-    // Config routes
-    Route::post('/config/capacity', [AdminController::class, 'updateCapacity']);
+// Config routes
+Route::post('/config/capacity', [AdminController::class, 'updateCapacity']);
 
-    Route::prefix('internal/tools')->group(function () {
-        Route::post('/booking-status', [InternalToolsController::class, 'getBookingStatus']);
-        Route::post('/user-bookings', [InternalToolsController::class, 'getUserBookings']);
-        Route::post('/port-schedule', [InternalToolsController::class, 'getPortSchedule']);
-        Route::post('/available-slots', [InternalToolsController::class, 'getAvailableSlots']);
-    });
+Route::prefix('internal/tools')->group(function () {
+    Route::post('/booking-status', [InternalToolsController::class, 'getBookingStatus']);
+    Route::post('/user-bookings', [InternalToolsController::class, 'getUserBookings']);
+    Route::post('/port-schedule', [InternalToolsController::class, 'getPortSchedule']);
+    Route::post('/available-slots', [InternalToolsController::class, 'getAvailableSlots']);
+});
+
+Route::middleware('auth:sanctum')->prefix('chat')->group(function () {
+    Route::get('/', [ChatController::class, 'createChat']);
+    Route::get('/user', [ChatController::class, 'getUserChats']);
+    Route::get('/{chatId}/messages', [ChatController::class, 'getChatMessages']);
+    Route::delete('/{chatId}', [ChatController::class, 'deleteChat']);
+});
+
+// AI API Routes
+Route::middleware('auth:sanctum')->prefix('ai')->group(function () {
+    Route::post('/generate', [AIController::class, 'generateMessage']);
 });
