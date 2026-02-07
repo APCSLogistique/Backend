@@ -35,7 +35,7 @@ A comprehensive terminal management system for port operations with booking mana
 
 ### User Roles
 
-- **Carrier** - Manage bookings, generate QR codes
+- **transiter** - Manage bookings, generate QR codes
 - **Operator** - Gate operations, scan QR codes
 - **Admin** - Full system control and reporting
 
