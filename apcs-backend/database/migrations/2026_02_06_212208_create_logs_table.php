@@ -11,12 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('bookings', function (Blueprint $table) {
+        Schema::create('logs', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users');
-            $table->string('truck_number');
-            $table->foreignId('timeslot_id')->constrained('timeslots');
-            $table->enum('status', ['pending', 'in', 'out'])->default('pending');
+            $table->timestamp('timestamp')->useCurrent();
+            $table->string('code');
+            $table->text('message');
             $table->timestamps();
         });
     }
@@ -26,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('bookings');
+        Schema::dropIfExists('logs');
     }
 };

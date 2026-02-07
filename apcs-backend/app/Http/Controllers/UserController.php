@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\RegisterRequest;
 use App\Http\Resources\UserResource;
+use App\Models\Booking;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
@@ -35,15 +37,52 @@ class UserController extends Controller
         ]);
 
         $user = User::where('email', $validated['email'])->first();
-        if ($user && bcrypt($validated['password']) === $user->password) {
+        if ($user && Hash::check($validated['password'], $user->password)) {
+
+            $token = $user->createToken('auth_token')->plainTextToken;
             return response()->json([
                 'message' => 'Login successful',
                 'user' => new UserResource($user),
+                'token' => $token,
             ], 200);
         } else {
             return response()->json([
                 'message' => 'Invalid email or password',
             ], 401);
         }
+    }
+
+    public function getProfile(Request $request)
+    {
+        $user = $request->user();
+
+        return response()->json([
+            'user_id' => $user->user_id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'role' => $user->role,
+        ]);
+    }
+    public function getUserBookings(Request $request)
+    {
+        $user = $request->user();
+
+        $bookings = Booking::where('user_id', $user->user_id)
+            ->with('timeslot')
+            ->get()
+            ->map(function ($booking) {
+                return [
+                    'booking_id' => $booking->id,
+                    'truck_number' => $booking->truck_number,
+                    'timeslot' => [
+                        'date' => $booking->timeslot->date,
+                        'hour_start' => $booking->timeslot->hour_start,
+                    ],
+                    'status' => $booking->status,
+                    'created_at' => $booking->created_at,
+                ];
+            });
+
+        return response()->json($bookings);
     }
 }

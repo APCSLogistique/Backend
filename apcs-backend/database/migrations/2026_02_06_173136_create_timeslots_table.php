@@ -14,9 +14,9 @@ return new class extends Migration
         Schema::create('timeslots', function (Blueprint $table) {
             $table->id();
             $table->date('date');
-            $table->integer('hour_start');
-            $table->integer('hour_end');
-            $table->integer('capacity')->default(0);
+            $table->string('hour_start');
+            $table->integer('capacity');
+            $table->integer('late_capacity');
             $table->timestamps();
         });
     }

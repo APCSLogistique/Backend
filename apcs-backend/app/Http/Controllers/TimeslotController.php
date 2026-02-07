@@ -2,64 +2,37 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Booking;
+use App\Models\Config;
 use App\Models\Timeslot;
 use Illuminate\Http\Request;
 
 class TimeslotController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function getTimeslotAvailability($date, $hour)
     {
-        //
-    }
+        $config = Config::first();
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
+        $timeslot = Timeslot::where('date', $date)
+            ->where('hour_start', $hour)
+            ->first();
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+        if (!$timeslot) {
+            return response()->json([
+                'max_capacity' => $config->capacity,
+                'used_capacity' => 0,
+                'late_capacity' => $config->late_capacity,
+            ]);
+        }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Timeslot $timeslot)
-    {
-        //
-    }
+        $usedCapacity = Booking::where('timeslot_id', $timeslot->id)
+            ->whereIn('status', ['pending', 'in']) // only active bookings
+            ->count();
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Timeslot $timeslot)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Timeslot $timeslot)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Timeslot $timeslot)
-    {
-        //
+        return response()->json([
+            'max_capacity' => $timeslot->capacity,
+            'used_capacity' => $usedCapacity,
+            'late_capacity' => $timeslot->late_capacity,
+        ]);
     }
 }
